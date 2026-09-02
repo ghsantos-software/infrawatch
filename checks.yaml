@@ -19,3 +19,8 @@ targets:
   - name: DNS do exemplo
     type: dns
     host: example.com
+
+  - name: Porta fechada de proposito
+    type: tcp
+    host: example.com
+    port: 12345
