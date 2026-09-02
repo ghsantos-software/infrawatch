@@ -1,0 +1,46 @@
+name: Health check agendado
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"   # de 6 em 6 horas
+  workflow_dispatch:          # botão "Run workflow" pra rodar na hora
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install --only-binary=:all: -r requirements.txt
+
+      - name: Rodar infrawatch
+        id: infrawatch
+        continue-on-error: true          # não para o job se sair != 0
+        run: python -m infrawatch --config checks.yaml --out report.md
+
+      - name: Publicar relatório no resumo da run
+        if: always()
+        run: cat report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Guardar relatório como artefato
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report
+          path: report.md
+
+      - name: Falhar a run se algo degradou
+        if: steps.infrawatch.outcome == 'failure'
+        run: |
+          echo "::error::infraestrutura degradada — veja o relatório acima"
+          exit 1
