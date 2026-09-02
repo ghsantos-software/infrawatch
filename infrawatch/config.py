@@ -1,6 +1,6 @@
 """Carrega e valida o arquivo de configuração (checks.yaml)."""
 
-from pathlib import Path # ler o arquivo de configuração
+from pathlib import Path  # ler o arquivo de configuração
 
 import yaml
 
