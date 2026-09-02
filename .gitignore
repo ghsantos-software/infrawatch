@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# saída gerada pela ferramenta (não é código)
+report.md
+report.json

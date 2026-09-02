@@ -1,0 +1,4 @@
+-r requirements.txt
+pytest==8.3.4 # fazer os testes unitários
+pytest-httpx==0.35.0 # facilitar os testes com HTTP
+ruff==0.9.2 # verificar a qualidade do código

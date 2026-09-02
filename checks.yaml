@@ -1,0 +1,21 @@
+# Lista de alvos para monitoramento
+targets: 
+  - name: Site de exemplo 
+    type: http 
+    url: https://example.com
+    expect_status: 200
+
+  - name: Porta HTTPS do exemplo
+    type: tcp
+    host: example.com
+    port: 443
+
+  - name: Certificado TLS do exemplo
+    type: tls
+    host: example.com
+    port: 443
+    warn_days: 21  # número de dias antes do vencimento do certificado para gerar um alerta (opcional, padrão: 30)
+
+  - name: DNS do exemplo
+    type: dns
+    host: example.com
