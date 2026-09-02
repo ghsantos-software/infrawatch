@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Instalar dependências
+        run: pip install --only-binary=:all: -r requirements-dev.txt
+
+      - name: Lint
+        run: ruff check .
+
+      - name: Testes
+        run: pytest
+
+  docker-build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: quality
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build (carrega local)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: infrawatch:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Smoke test da imagem
+        run: docker run --rm infrawatch:ci --help
